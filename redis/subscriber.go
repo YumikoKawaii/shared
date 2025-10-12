@@ -2,33 +2,24 @@ package redis
 
 import (
 	"context"
+
+	"github.com/YumikoKawaii/shared/pubsub"
 	v8 "github.com/go-redis/redis/v8"
 	"github.com/sirupsen/logrus"
 )
 
-type HandleMessageFn func(bytes []byte) error
-
-type InformMessageHandled func()
-
-type Consumer interface {
-	Consume(ctx context.Context, topic string, fn HandleMessageFn)
-	Close(ctx context.Context) error
-}
-
-type consumerImpl struct {
+type subscriberImpl struct {
 	redisClient *v8.Client
 	subscriber  *v8.PubSub
-	informFn    InformMessageHandled
 }
 
-func NewConsumer(client *v8.Client, informFn InformMessageHandled) Consumer {
-	return &consumerImpl{
+func NewSubscriber(client *v8.Client) pubsub.Subscriber {
+	return &subscriberImpl{
 		redisClient: client,
-		informFn:    informFn,
 	}
 }
 
-func (c *consumerImpl) Consume(ctx context.Context, topic string, fn HandleMessageFn) {
+func (c *subscriberImpl) Consume(ctx context.Context, topic string, fn pubsub.HandleMessageFn) {
 
 	subscriber := c.redisClient.Subscribe(ctx, topic)
 	c.subscriber = subscriber
@@ -44,11 +35,9 @@ func (c *consumerImpl) Consume(ctx context.Context, topic string, fn HandleMessa
 		if err := fn(bytes); err != nil {
 			logrus.Errorf("error handling message: %s", err.Error())
 		}
-
-		c.informFn()
 	}
 }
 
-func (c *consumerImpl) Close(ctx context.Context) error {
+func (c *subscriberImpl) Close(ctx context.Context) error {
 	return c.subscriber.Close()
 }
