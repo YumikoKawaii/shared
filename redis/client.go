@@ -21,6 +21,12 @@ func Initialize(cfg Config) (*redis.Client, error) {
 		}
 	}
 
+	if cfg.EnableMetric {
+		if err := redisotel.InstrumentMetrics(client); err != nil {
+			return nil, err
+		}
+	}
+
 	if err := client.Ping(context.Background()).Err(); err != nil {
 		return nil, err
 	}
