@@ -4,15 +4,15 @@ import (
 	"context"
 
 	"github.com/YumikoKawaii/shared/pubsub"
-	v8 "github.com/go-redis/redis/v8"
+	v9 "github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )
 
 type publisherImpl struct {
-	redisClient *v8.Client
+	redisClient *v9.Client
 }
 
-func NewPublisher(client *v8.Client) pubsub.Publisher {
+func NewPublisher(client *v9.Client) pubsub.Publisher {
 	return &publisherImpl{
 		redisClient: client,
 	}
