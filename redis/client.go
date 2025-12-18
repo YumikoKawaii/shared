@@ -1,12 +1,14 @@
 package redis
 
 import (
+	"context"
+
 	"github.com/YumikoKawaii/shared/logger"
 	"github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
 )
 
-func Initialize(cfg Config) *redis.Client {
+func Initialize(cfg Config) (*redis.Client, error) {
 
 	client := redis.NewClient(
 		&redis.Options{
@@ -18,5 +20,10 @@ func Initialize(cfg Config) *redis.Client {
 			logger.Errorf("error enable tracing redis: %s", err.Error())
 		}
 	}
-	return client
+
+	if err := client.Ping(context.Background()).Err(); err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }
