@@ -32,6 +32,10 @@ func Initialize(config *Config, opts ...grpc.ServerOption) *Server {
 	}
 }
 
+func (s *Server) Instance() *grpc.Server {
+	return s.instance
+}
+
 func (s *Server) Serve() error {
 	stop := make(chan os.Signal, 1)
 	errch := make(chan error)
