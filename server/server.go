@@ -14,8 +14,15 @@ import (
 )
 
 type Config struct {
-	GRPC string
-	HTTP string
+	GRPC string `json:"grpc" mapstructure:"grpc" yaml:"grpc"`
+	HTTP string `json:"http" mapstructure:"http" yaml:"http"`
+}
+
+func DefaultConfig() *Config {
+	return &Config{
+		GRPC: "0.0.0.0:10443",
+		HTTP: "0.0.0.0:10080",
+	}
 }
 
 type Server struct {
