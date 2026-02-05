@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 )
 
@@ -55,6 +56,7 @@ func (s *Server) Serve() error {
 	errch := make(chan error)
 	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	httpMux := http.NewServeMux()
+	httpMux.Handle("/metrics", promhttp.Handler())
 	httpMux.Handle("/", s.mux)
 	httpServer := http.Server{
 		Addr:    s.config.HTTP,

@@ -6,6 +6,7 @@ toolchain go1.24.6
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.40.3
+	github.com/go-logr/zapr v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.7
 	github.com/redis/go-redis/extra/redisotel/v9 v9.17.2
 	github.com/redis/go-redis/v9 v9.17.2
@@ -37,7 +38,6 @@ require (
 	github.com/go-faster/errors v0.7.1 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-logr/zapr v1.3.0 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
