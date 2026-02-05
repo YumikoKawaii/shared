@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/YumikoKawaii/shared/logger"
 	"github.com/go-logr/zapr"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
@@ -13,6 +12,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	"go.uber.org/zap"
 )
 
 func Initialize(ctx context.Context, config *Configuration) (*metric.MeterProvider, error) {
@@ -25,11 +25,8 @@ func Initialize(ctx context.Context, config *Configuration) (*metric.MeterProvid
 		return nil, fmt.Errorf("failed to create resource: %w", err)
 	}
 
-	zapLogger, err := logger.GetZapLoggerDelegate(logger.Get())
-	if err != nil {
-		return nil, fmt.Errorf("error get zap logger delegate: %w", err)
-	}
-	otel.SetLogger(zapr.NewLogger(zapLogger.Desugar()))
+	zapLogger, _ := zap.NewDevelopment()
+	otel.SetLogger(zapr.NewLogger(zapLogger))
 
 	promExporter, err := prometheus.New()
 	if err != nil {
