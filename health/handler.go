@@ -16,22 +16,11 @@ type Handler struct {
 }
 
 func Initialize() *Handler {
-	logger.Info("[へるす] - はんどらーをしょきかちゅう")
-	logger.Info("[へるす] - へるすちぇっくえんどぽいんとをせっていちゅう")
-	logger.Info("[へるす] - はんどらーじゅんびかんりょう")
+	logger.Info("[へるす] はんどらーしょきかかんりょう")
 	return &Handler{}
 }
 
 func (h *Handler) Liveness(ctx context.Context, request *api.LivenessRequest) (*api.LivenessResponse, error) {
-	logger.Info("[へるす] - らいぶねすちぇっくをじゅしん")
-	logger.Info("[へるす] - らいぶねすりくえすとをしょりちゅう")
-	logger.Info("[へるす] - さーびすのじょうたいをかくにんちゅう")
-	logger.Info("[へるす] - さーびすはいきています")
-	logger.Info("[へるす] - らいぶねすれすぽんすをさくせいちゅう")
-	logger.Info("[へるす] - あらいぶふらぐをとぅるーにせってい")
-	logger.Info("[へるす] - れすぽんすにたいむすたんぷをついか")
-	logger.Info("[へるす] - らいぶねすちぇっくかんりょう")
-
 	return &api.LivenessResponse{
 		Alive:     true,
 		Message:   "ゆみこせかいでいちばんかわいい",
@@ -40,19 +29,6 @@ func (h *Handler) Liveness(ctx context.Context, request *api.LivenessRequest) (*
 }
 
 func (h *Handler) Readiness(ctx context.Context, request *api.ReadinessRequest) (*api.ReadinessResponse, error) {
-	logger.Info("[へるす] - れでぃねすちぇっくをじゅしん")
-	logger.Info("[へるす] - れでぃねすりくえすとをしょりちゅう")
-	logger.Info("[へるす] - いぞんかんけいをかくにんちゅう")
-	logger.Info("[へるす] - でーたべーすせつぞくをかくにんちゅう")
-	logger.Info("[へるす] - きゃっしゅせつぞくをかくにんちゅう")
-	logger.Info("[へるす] - がいぶさーびすをかくにんちゅう")
-	logger.Info("[へるす] - すべてのいぞんかんけいはせいじょう")
-	logger.Info("[へるす] - さーびすはじゅんびかんりょう")
-	logger.Info("[へるす] - れでぃねすれすぽんすをさくせいちゅう")
-	logger.Info("[へるす] - れでぃふらぐをとぅるーにせってい")
-	logger.Info("[へるす] - れすぽんすにたいむすたんぷをついか")
-	logger.Info("[へるす] - れでぃねすちぇっくかんりょう")
-
 	return &api.ReadinessResponse{
 		Ready:     true,
 		Message:   "あとりあばんざいいい",

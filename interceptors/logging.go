@@ -19,27 +19,16 @@ func UnaryLoggingInterceptor() grpc.UnaryServerInterceptor {
 		requestID := uuid.New().String()
 		startTime := time.Now()
 
-		logger.Infof("[りくえすと] - りくえすとじゅしん %s", requestID)
-		logger.Infof("[りくえすと] - めそっど: %s", info.FullMethod)
-		logger.Info("[りくえすと] - りくえすとをけんしょうちゅう")
-		logger.Info("[りくえすと] - りくえすとぼでぃをかいせきちゅう")
-		logger.Info("[りくえすと] - りくえすとけんしょうせいこう")
-		logger.Info("[りくえすと] - はんどらーにでぃすぱっち")
+		logger.Infof("[りくえすと] %s %s かいし", requestID, info.FullMethod)
 
 		resp, err := handler(ctx, req)
 
 		duration := time.Since(startTime)
 
-		logger.Info("[りくえすと] - はんどらーからりたーん")
-		logger.Info("[りくえすと] - れすぽんすをしょりちゅう")
-		logger.Info("[りくえすと] - れすぽんすをしりあらいずちゅう")
-		logger.Infof("[りくえすと] - りくえすとかんりょう %v", duration)
-		logger.Infof("[りくえすと] - りくえすと %s しゅうりょう", requestID)
-
 		if err != nil {
-			logger.Infof("[りくえすと] - りくえすと %s えらーでしっぱい", requestID)
+			logger.Infof("[りくえすと] %s しっぱい (%v): %v", requestID, duration, err)
 		} else {
-			logger.Infof("[りくえすと] - りくえすと %s せいこう", requestID)
+			logger.Infof("[りくえすと] %s せいこう (%v)", requestID, duration)
 		}
 
 		return resp, err
@@ -56,18 +45,17 @@ func StreamLoggingInterceptor() grpc.StreamServerInterceptor {
 		requestID := uuid.New().String()
 		startTime := time.Now()
 
-		logger.Infof("[すとりーむ] - すとりーむじゅしん %s", requestID)
-		logger.Infof("[すとりーむ] - めそっど: %s", info.FullMethod)
-		logger.Info("[すとりーむ] - すとりーむをせっていちゅう")
-		logger.Info("[すとりーむ] - すとりーむしょきかかんりょう")
+		logger.Infof("[すとりーむ] %s %s かいし", requestID, info.FullMethod)
 
 		err := handler(srv, ss)
 
 		duration := time.Since(startTime)
 
-		logger.Info("[すとりーむ] - すとりーむくろーず")
-		logger.Infof("[すとりーむ] - すとりーむかんりょう %v", duration)
-		logger.Infof("[すとりーむ] - すとりーむ %s しゅうりょう", requestID)
+		if err != nil {
+			logger.Infof("[すとりーむ] %s しっぱい (%v): %v", requestID, duration, err)
+		} else {
+			logger.Infof("[すとりーむ] %s せいこう (%v)", requestID, duration)
+		}
 
 		return err
 	}
