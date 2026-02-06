@@ -12,7 +12,7 @@ type grpcClient struct {
 	client api.AcousticsClient
 }
 
-func NewGRPCClient(endpoint string) (Client, error) {
+func newGRPCClient(endpoint string) (Client, error) {
 	conn, err := grpc.NewClient(endpoint, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err

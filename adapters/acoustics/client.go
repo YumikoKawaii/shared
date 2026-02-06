@@ -7,6 +7,15 @@ type Config struct {
 	Protocol string `json:"protocol" mapstructure:"protocol" yaml:"protocol"`
 }
 
+func Initialize(config *Config) (Client, error) {
+	switch config.Protocol {
+	case "http":
+		return newHTTPClient(config.Endpoint)
+	default:
+		return newGRPCClient(config.Endpoint)
+	}
+}
+
 type EntryRequest struct{}
 
 type EntryResponse struct{}

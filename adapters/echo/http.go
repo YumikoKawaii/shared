@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	EntryEndpoint     = "api/v1/entry"
 	ChargeEndpoint    = "api/v1/charge"
 	DischargeEndpoint = "api/v1/discharge"
 )
@@ -19,7 +18,7 @@ type httpClient struct {
 	client   *http.Client
 }
 
-func NewHTTPClient(endpoint string) (Client, error) {
+func newHTTPClient(endpoint string) (Client, error) {
 	return &httpClient{
 		endpoint: endpoint,
 		client:   &http.Client{},

@@ -17,7 +17,7 @@ type httpClient struct {
 	client   *http.Client
 }
 
-func NewHTTPClient(endpoint string) (Client, error) {
+func newHTTPClient(endpoint string) (Client, error) {
 	return &httpClient{
 		endpoint: endpoint,
 		client:   &http.Client{},
