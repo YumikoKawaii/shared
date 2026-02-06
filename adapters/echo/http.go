@@ -1,4 +1,4 @@
-package acoustics
+package echo
 
 import (
 	"bytes"
