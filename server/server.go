@@ -26,10 +26,11 @@ func DefaultConfig() *Config {
 }
 
 type Server struct {
-	instance *grpc.Server
-	mux      *runtime.ServeMux
-	httpMux  *http.ServeMux
-	config   *Config
+	instance    *grpc.Server
+	mux         *runtime.ServeMux
+	httpMux     *http.ServeMux
+	httpHandler *http.Handler
+	config      *Config
 }
 
 func Initialize(config *Config, opts ...grpc.ServerOption) *Server {
@@ -57,6 +58,10 @@ func (s *Server) GRPCHost() string {
 	return s.config.GRPC
 }
 
+func (s *Server) SetHttpHandler(handler *http.Handler) {
+	s.httpHandler = handler
+}
+
 func (s *Server) Serve() error {
 	stop := make(chan os.Signal, 1)
 	errch := make(chan error)
@@ -66,6 +71,9 @@ func (s *Server) Serve() error {
 	httpServer := http.Server{
 		Addr:    s.config.HTTP,
 		Handler: s.httpMux,
+	}
+	if s.httpHandler != nil {
+		httpServer.Handler = *s.httpHandler
 	}
 	go func() {
 		if err := httpServer.ListenAndServe(); err != nil {
