@@ -81,8 +81,8 @@ type Configuration struct {
 	FileLocation      string `json:"file_location" mapstructure:"file_location" yaml:"file_location"`
 }
 
-func DefaultConfig() Configuration {
-	return Configuration{
+func DefaultConfig() *Configuration {
+	return &Configuration{
 		EnableConsole:     true,
 		ConsoleJSONFormat: false,
 		ConsoleLevel:      "info",
@@ -97,17 +97,13 @@ func DefaultLogger() Logger {
 	return logger
 }
 
-// InitLogger returns an instance of logger
-func InitLogger(conf Configuration) (Logger, error) {
+// Initialize change config
+func Initialize(conf *Configuration) error {
 	var err error
 	once.Do(func() {
-		log, err = NewLogger(conf)
+		log, err = newZapLogger(conf)
 	})
-	return log, err
-}
-
-func NewLogger(conf Configuration) (Logger, error) {
-	return newZapLogger(conf)
+	return err
 }
 
 func Debug(msg string) {
