@@ -2,6 +2,7 @@ package logger
 
 import (
 	"context"
+	"errors"
 	"sync"
 )
 
@@ -10,6 +11,9 @@ var log Logger = DefaultLogger()
 
 // Fields Type to pass when we want to call WithFields for structured logging
 type Fields map[string]interface{}
+
+// LoggerBackend reprents the int enum for backend of logger (exists for legacy compat reason)
+type LoggerBackend string
 
 type LogLvl string
 
@@ -39,7 +43,18 @@ const (
 	fatalLvl = "fatal"
 )
 
-var once sync.Once
+const (
+	// LoggerBackendZap logging using Uber's zap backend
+	LoggerBackendZap LoggerBackend = "zap"
+	// LoggerBackendLogrus logging using logrus backend
+	LoggerBackendLogrus LoggerBackend = "logrus"
+)
+
+var (
+	errInvalidLoggerInstance = errors.New("invalid logger instance")
+
+	once sync.Once
+)
 
 // Logger is our contract for the logger
 type Logger interface {
@@ -71,22 +86,26 @@ type Logger interface {
 }
 
 // Configuration stores the config for the logger
+// For some loggers there can only be one level across writers, for such the level of Console is picked by default
 type Configuration struct {
-	EnableConsole     bool   `json:"enable_console" mapstructure:"enable_console" yaml:"enable_console"`
-	ConsoleJSONFormat bool   `json:"console_json_format" mapstructure:"console_json_format" yaml:"console_json_format"`
-	ConsoleLevel      string `json:"console_level" mapstructure:"console_level" yaml:"console_level"`
-	EnableFile        bool   `json:"enable_file" mapstructure:"enable_file" yaml:"enable_file"`
-	FileJSONFormat    bool   `json:"file_json_format" mapstructure:"file_json_format" yaml:"file_json_format"`
-	FileLevel         string `json:"file_level" mapstructure:"file_level" yaml:"file_level"`
-	FileLocation      string `json:"file_location" mapstructure:"file_location" yaml:"file_location"`
+	Backend           LoggerBackend `json:"backend" mapstructure:"backend" name:"log-backend" help:"Logger backend" env:"BACKEND" default:"zap" enum:"zap, logrus"`
+	EnableConsole     bool          `json:"enable_console" mapstructure:"enable_console" name:"log-enable-console" help:"Enable log console" env:"ENABLE_CONSOLE" default:"true"`
+	ConsoleJSONFormat bool          `json:"console_json_format" mapstructure:"console_json_format" name:"log-console-json-format" help:"Console to json format" env:"CONSOLE_JSON_FORMAT" default:"false"`
+	ConsoleLevel      string        `json:"console_level" mapstructure:"console_level" name:"log-console-level" help:"Console log level" env:"CONSOLE_LEVEL" default:"info" enum:"debug, info, warn, error, fatal, panic"`
+	EnableFile        bool
+	FileJSONFormat    bool
+	FileLevel         string
+	FileLocation      string
 }
 
-func DefaultConfig() *Configuration {
-	return &Configuration{
+func DefaultConfig() Configuration {
+	return Configuration{
+		Backend:           LoggerBackendZap,
 		EnableConsole:     true,
 		ConsoleJSONFormat: false,
 		ConsoleLevel:      "info",
 		EnableFile:        false,
+		FileJSONFormat:    false,
 	}
 }
 
@@ -97,13 +116,23 @@ func DefaultLogger() Logger {
 	return logger
 }
 
-// Initialize change config
-func Initialize(conf *Configuration) error {
+// InitLogger returns an instance of logger
+func InitLogger(conf Configuration) (Logger, error) {
 	var err error
 	once.Do(func() {
-		log, err = newZapLogger(conf)
+		switch conf.Backend {
+		case LoggerBackendZap, LoggerBackendLogrus:
+			log, err = NewLogger(conf)
+
+		default:
+			err = errInvalidLoggerInstance
+		}
 	})
-	return err
+	return log, err
+}
+
+func NewLogger(conf Configuration) (Logger, error) {
+	return newZapLogger(conf)
 }
 
 func Debug(msg string) {

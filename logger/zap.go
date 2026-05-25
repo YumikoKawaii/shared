@@ -133,7 +133,7 @@ func getZapLevel(level string) zapcore.Level {
 	}
 }
 
-func newZapLogger(config *Configuration) (Logger, error) {
+func newZapLogger(config Configuration) (Logger, error) {
 	var cores []zapcore.Core
 
 	if config.EnableConsole {
