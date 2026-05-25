@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 )
 
@@ -25,15 +26,18 @@ func DefaultConfig() *Config {
 }
 
 type Server struct {
-	instance *grpc.Server
-	mux      *runtime.ServeMux
-	config   *Config
+	instance    *grpc.Server
+	mux         *runtime.ServeMux
+	httpMux     *http.ServeMux
+	httpHandler *http.Handler
+	config      *Config
 }
 
 func Initialize(config *Config, opts ...grpc.ServerOption) *Server {
 	return &Server{
 		instance: grpc.NewServer(opts...),
 		mux:      runtime.NewServeMux(),
+		httpMux:  http.NewServeMux(),
 		config:   config,
 	}
 }
@@ -46,19 +50,30 @@ func (s *Server) Mux() *runtime.ServeMux {
 	return s.mux
 }
 
+func (s *Server) HttpMux() *http.ServeMux {
+	return s.httpMux
+}
+
 func (s *Server) GRPCHost() string {
 	return s.config.GRPC
+}
+
+func (s *Server) SetHttpHandler(handler *http.Handler) {
+	s.httpHandler = handler
 }
 
 func (s *Server) Serve() error {
 	stop := make(chan os.Signal, 1)
 	errch := make(chan error)
 	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	httpMux := http.NewServeMux()
-	httpMux.Handle("/", s.mux)
+	s.httpMux.Handle("/metrics", promhttp.Handler())
+	s.httpMux.Handle("/", s.mux)
 	httpServer := http.Server{
 		Addr:    s.config.HTTP,
-		Handler: httpMux,
+		Handler: s.httpMux,
+	}
+	if s.httpHandler != nil {
+		httpServer.Handler = *s.httpHandler
 	}
 	go func() {
 		if err := httpServer.ListenAndServe(); err != nil {
